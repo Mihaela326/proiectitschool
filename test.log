@@ -1,0 +1,55 @@
+[2025-11-30 12:28:32] INFO    : Date and Time: 2025-11-30 12:28:32
+[2025-11-30 12:28:32] WARNING : OS: Unable to determine (Linux detected)
+[2025-11-30 12:28:32] WARNING : Kernel: Unable to determine
+[2025-11-30 12:28:32] INFO    : Hostname: DESKTOP-7PVC89M
+[2025-11-30 12:28:32] WARNING : Load Average: Unable to determine - module 'os' has no attribute 'getloadavg'
+[2025-11-30 12:28:32] INFO    : Uptime: 12 days, 18 hours, 22 minutes
+[2025-11-30 12:28:33] INFO    : CPU Usage: 9.2%
+[2025-11-30 12:28:33] INFO    : Memory Usage: Total=15.7GB, Used=9.2GB, Available=6.5GB, Percentage=58.5%
+[2025-11-30 12:28:33] INFO    : Disk Usage: C:\ = 281.0GB / 953.0GB (29.5%)
+[2025-11-30 12:28:33] INFO    : Disk Usage: D:\ = 21.2GB / 476.9GB (4.4%)
+[2025-11-30 12:28:33] INFO    : No critical alerts
+[2025-11-30 12:28:38] INFO    : Date and Time: 2025-11-30 12:28:38
+[2025-11-30 12:28:38] WARNING : OS: Unable to determine (Linux detected)
+[2025-11-30 12:28:38] WARNING : Kernel: Unable to determine
+[2025-11-30 12:28:38] INFO    : Hostname: DESKTOP-7PVC89M
+[2025-11-30 12:28:38] WARNING : Load Average: Unable to determine - module 'os' has no attribute 'getloadavg'
+[2025-11-30 12:28:38] INFO    : Uptime: 12 days, 18 hours, 22 minutes
+[2025-11-30 12:28:39] INFO    : CPU Usage: 9.1%
+[2025-11-30 12:28:39] INFO    : Memory Usage: Total=15.7GB, Used=9.2GB, Available=6.5GB, Percentage=58.4%
+[2025-11-30 12:28:39] INFO    : Disk Usage: C:\ = 281.0GB / 953.0GB (29.5%)
+[2025-11-30 12:28:39] INFO    : Disk Usage: D:\ = 21.2GB / 476.9GB (4.4%)
+[2025-11-30 12:28:39] INFO    : No critical alerts
+[2025-11-30 12:28:44] INFO    : Date and Time: 2025-11-30 12:28:44
+[2025-11-30 12:28:44] WARNING : OS: Unable to determine (Linux detected)
+[2025-11-30 12:28:44] WARNING : Kernel: Unable to determine
+[2025-11-30 12:28:44] INFO    : Hostname: DESKTOP-7PVC89M
+[2025-11-30 12:28:44] WARNING : Load Average: Unable to determine - module 'os' has no attribute 'getloadavg'
+[2025-11-30 12:28:44] INFO    : Uptime: 12 days, 18 hours, 22 minutes
+[2025-11-30 12:28:45] INFO    : CPU Usage: 11.4%
+[2025-11-30 12:28:45] INFO    : Memory Usage: Total=15.7GB, Used=9.2GB, Available=6.5GB, Percentage=58.4%
+[2025-11-30 12:28:45] INFO    : Disk Usage: C:\ = 281.0GB / 953.0GB (29.5%)
+[2025-11-30 12:28:45] INFO    : Disk Usage: D:\ = 21.2GB / 476.9GB (4.4%)
+[2025-11-30 12:28:45] INFO    : No critical alerts
+[2025-11-30 12:28:50] INFO    : Date and Time: 2025-11-30 12:28:50
+[2025-11-30 12:28:50] WARNING : OS: Unable to determine (Linux detected)
+[2025-11-30 12:28:50] WARNING : Kernel: Unable to determine
+[2025-11-30 12:28:50] INFO    : Hostname: DESKTOP-7PVC89M
+[2025-11-30 12:28:50] WARNING : Load Average: Unable to determine - module 'os' has no attribute 'getloadavg'
+[2025-11-30 12:28:50] INFO    : Uptime: 12 days, 18 hours, 22 minutes
+[2025-11-30 12:28:51] INFO    : CPU Usage: 12.8%
+[2025-11-30 12:28:51] INFO    : Memory Usage: Total=15.7GB, Used=9.2GB, Available=6.5GB, Percentage=58.5%
+[2025-11-30 12:28:51] INFO    : Disk Usage: C:\ = 281.0GB / 953.0GB (29.5%)
+[2025-11-30 12:28:51] INFO    : Disk Usage: D:\ = 21.2GB / 476.9GB (4.4%)
+[2025-11-30 12:28:51] INFO    : No critical alerts
+[2025-11-30 12:28:56] INFO    : Date and Time: 2025-11-30 12:28:56
+[2025-11-30 12:28:56] WARNING : OS: Unable to determine (Linux detected)
+[2025-11-30 12:28:56] WARNING : Kernel: Unable to determine
+[2025-11-30 12:28:56] INFO    : Hostname: DESKTOP-7PVC89M
+[2025-11-30 12:28:56] WARNING : Load Average: Unable to determine - module 'os' has no attribute 'getloadavg'
+[2025-11-30 12:28:56] INFO    : Uptime: 12 days, 18 hours, 22 minutes
+[2025-11-30 12:28:57] INFO    : CPU Usage: 8.2%
+[2025-11-30 12:28:57] INFO    : Memory Usage: Total=15.7GB, Used=9.2GB, Available=6.5GB, Percentage=58.5%
+[2025-11-30 12:28:57] INFO    : Disk Usage: C:\ = 281.0GB / 953.0GB (29.5%)
+[2025-11-30 12:28:57] INFO    : Disk Usage: D:\ = 21.2GB / 476.9GB (4.4%)
+[2025-11-30 12:28:57] INFO    : No critical alerts

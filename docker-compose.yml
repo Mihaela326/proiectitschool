@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  core_agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.bash
+    image: system-monitor-core:latest
+    container_name: core_agent
+    restart: always
+    volumes:
+      - monitoring-logs-core:/var/log
+    environment:
+      - LOG_PATH=/var/log/system-monitor.log
+    command: ["/app/info.sh", "5"]
+
+  extended_agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    image: system-monitor-extended:latest
+    container_name: extended_agent
+    restart: always
+    volumes:
+      - monitoring-logs-extended:/var/log
+    environment:
+      - LOG_PATH=/var/log/system-monitor.log
+      - PYTHONUNBUFFERED=1
+    command: ["python3", "/app/info.py", "5"]
+
+  monitor_hub:
+    build:
+      context: .
+      dockerfile: Dockerfile.hub
+    image: system-monitor-hub:latest
+    container_name: monitor_hub
+    restart: always
+    profiles:
+      - dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - monitoring-logs-core:/var/log/core:ro
+      - monitoring-logs-extended:/var/log/extended:ro
+    environment:
+      - LOG_PATH_BASH=/var/log/core/system-monitor.log
+      - LOG_PATH_PY=/var/log/extended/system-monitor.log
+    command: ["python3", "/app/hub.py"]
+
+volumes:
+  monitoring-logs-core:
+    driver: local
+  monitoring-logs-extended:
+    driver: local

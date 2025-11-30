@@ -1,0 +1,209 @@
+---
+- name: Gather facts
+  ansible.builtin.setup:
+
+- name: Ensure required apt packages (Debian/Ubuntu)
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+      - git
+    update_cache: yes
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Install prerequisite packages (RedHat)
+  ansible.builtin.yum:
+    name:
+      - curl
+      - git
+    state: present
+  when: ansible_facts['os_family'] == 'RedHat'
+
+- name: Install Python3 and pip (Debian)
+  ansible.builtin.apt:
+    name:
+      - python3
+      - python3-pip
+    state: present
+    update_cache: yes
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Install Python3 and pip (RedHat)
+  ansible.builtin.yum:
+    name:
+      - python3
+      - python3-pip
+    state: present
+  when: ansible_facts['os_family'] == 'RedHat'
+
+- name: Try to install docker using the distro package repo (Debian)
+  block:
+    - name: Add Docker repository GPG key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker apt repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_facts['lsb']['codename'] }} stable"
+        state: present
+
+    - name: Install docker packages
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: latest
+        update_cache: yes
+  rescue:
+    - name: Fallback: install docker via convenience script
+      ansible.builtin.shell: curl -fsSL https://get.docker.com | sh
+      args:
+        warn: false
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Try to install docker using the distro package repo (RedHat)
+  block:
+    - name: Install required yum packages for docker repo
+      ansible.builtin.yum:
+        name:
+          - yum-utils
+          - device-mapper-persistent-data
+          - lvm2
+        state: present
+
+    - name: Add Docker repo (RHEL)
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+        mode: '0644'
+
+    - name: Install docker packages
+      ansible.builtin.yum:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: latest
+  rescue:
+    - name: Fallback: install docker via convenience script
+      ansible.builtin.shell: curl -fsSL https://get.docker.com | sh
+      args:
+        warn: false
+  when: ansible_facts['os_family'] == 'RedHat'
+
+- name: Ensure docker service is started and enabled
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Install docker-compose via pip
+  ansible.builtin.pip:
+    name: docker-compose
+    executable: pip3
+
+- name: Create monitoring user
+  ansible.builtin.user:
+    name: "{{ monitor_user }}"
+    comment: "Monitoring service user"
+    create_home: yes
+    shell: /bin/bash
+    groups: docker
+    append: yes
+    state: present
+
+- name: Create project directory
+  ansible.builtin.file:
+    path: "{{ project_dir }}"
+    state: directory
+    owner: "{{ monitor_user }}"
+    group: "{{ monitor_user }}"
+    mode: '0755'
+    recurse: yes
+
+- name: Clone project from git when repo_url provided
+  ansible.builtin.git:
+    repo: "{{ repo_url }}"
+    dest: "{{ project_dir }}"
+    version: "{{ repo_branch }}"
+    force: yes
+    update: yes
+    accept_hostkey: yes
+    owner: "{{ monitor_user }}"
+    group: "{{ monitor_user }}"
+  when: repo_url | length > 0
+
+- name: Copy project from control node when local_copy is true
+  ansible.builtin.synchronize:
+    src: "{{ local_src_path }}"
+    dest: "{{ project_dir }}"
+    rsync_opts:
+      - "--delete"
+    recursive: yes
+    owner: yes
+    group: yes
+  when: local_copy | bool
+
+- name: Ensure ownership of project directory
+  ansible.builtin.file:
+    path: "{{ project_dir }}"
+    owner: "{{ monitor_user }}"
+    group: "{{ monitor_user }}"
+    recurse: yes
+
+- name: Run docker compose up -d
+  ansible.builtin.command:
+    cmd: docker compose up -d --remove-orphans
+    chdir: "{{ project_dir }}"
+  register: compose_up
+  changed_when: "'Up' in compose_up.stdout or compose_up.rc == 0"
+  failed_when: compose_up.rc != 0 and compose_up.rc != 1
+
+- name: Wait for containers to be healthy (short pause)
+  ansible.builtin.pause:
+    seconds: 5
+
+- name: Gather running containers (docker)
+  ansible.builtin.command:
+    cmd: docker ps --format "{{'{{.Names}}'}} {{'{{.Status}}'}}"
+  register: docker_ps
+
+- name: Show running containers
+  ansible.builtin.debug:
+    var: docker_ps.stdout_lines
+
+- name: Create archive directory for logs
+  ansible.builtin.file:
+    path: "{{ archive_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install archive script
+  ansible.builtin.copy:
+    dest: /usr/local/bin/archive_monitoring_logs.sh
+    owner: root
+    group: root
+    mode: '0755'
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      ARCHIVE_DIR="{{ archive_dir }}"
+      mkdir -p "$ARCHIVE_DIR"
+      find {{ project_dir }} -type f -name "*.log" -mtime +{{ archive_retention_days }} -print0 |
+        xargs -0 tar -czf "$ARCHIVE_DIR/logs-$(date +%F-%s).tar.gz" --transform='s,^,archived/,S' -T - || true
+
+- name: Create cron job to archive logs (daily)
+  ansible.builtin.cron:
+    name: "Archive monitoring logs daily"
+    minute: "0"
+    hour: "2"
+    user: root
+    job: "/usr/local/bin/archive_monitoring_logs.sh >> /var/log/archive_monitoring.log 2>&1"
+  when: archive_retention_days | int > 0

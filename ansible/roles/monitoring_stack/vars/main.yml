@@ -1,0 +1,10 @@
+---
+# Role variables — override in playbook or via extra-vars
+monitor_user: monitoring
+project_dir: "/opt/monitoring-stack"
+repo_url: ""             # set to your git repo (e.g. https://github.com/you/repo.git)
+repo_branch: "main"
+local_copy: false          # set true to copy local_src_path from control node
+local_src_path: ""       # used if local_copy is true
+archive_retention_days: 7
+archive_dir: /var/log/monitoring-archives

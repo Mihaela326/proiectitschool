@@ -1,0 +1,13 @@
+---
+- name: Deploy Monitoring Stack to remote hosts
+  hosts: monitoring:monitor_hub
+  become: true
+  vars:
+    # If set, playbook will git clone this repo. If empty, set `local_copy: true` and provide `local_src_path`.
+    repo_url: ""
+    repo_branch: "main"
+    project_dir: "/opt/monitoring-stack"
+    local_copy: false
+    local_src_path: ""  # path on control machine to copy if not using git
+  roles:
+    - monitoring_stack
