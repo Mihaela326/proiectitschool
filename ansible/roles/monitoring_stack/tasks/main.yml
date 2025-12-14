@@ -198,31 +198,7 @@
     group: "{{ monitor_user }}"
     recurse: yes
 
-- name: "Diagnostic: stat docker socket"
-  ansible.builtin.stat:
-    path: /var/run/docker.sock
-  register: docker_sock_stat
-  become: yes
-
-- name: Show docker socket details
-  ansible.builtin.shell: ls -l /var/run/docker.sock || true
-  register: docker_sock_ls
-  changed_when: false
-  become: yes
-
-- name: Show docker socket ACL (if getfacl available)
-  ansible.builtin.shell: getfacl /var/run/docker.sock || true
-  register: docker_sock_acl
-  changed_when: false
-  become: yes
-
-- name: Attempt to give monitor user access to docker socket via setfacl
-  ansible.builtin.command: setfacl -m u:{{ monitor_user }}:rw /var/run/docker.sock
-  become: yes
-  ignore_errors: true
-
-
-- name: Run docker compose up -d
+- name: Run docker compose up -d as monitoring user
   ansible.builtin.command:
     cmd: docker compose up -d --remove-orphans
     chdir: "{{ project_dir }}"
@@ -230,16 +206,18 @@
   changed_when: "'Up' in compose_up.stdout or compose_up.rc == 0"
   failed_when: compose_up.rc != 0 and compose_up.rc != 1
   become: yes
+  become_user: "{{ monitor_user }}"
 
 - name: Wait for containers to be healthy (short pause)
   ansible.builtin.pause:
     seconds: 5
 
-- name: Gather running containers (docker)
+- name: Gather running containers as monitoring user
   ansible.builtin.command:
     cmd: docker ps --format "{{'{{.Names}}'}} {{'{{.Status}}'}}"
   register: docker_ps
   become: yes
+  become_user: "{{ monitor_user }}"
 
 - name: Show running containers
   ansible.builtin.debug:

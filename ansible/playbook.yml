@@ -13,6 +13,8 @@
     project_dir: "/opt/monitoring-stack"
     local_copy: false
     local_src_path: ""  # path on control machine to copy if not using git
+    # Workaround for become_user temporary directory permissions: use sudo with the user flag
+    ansible_sudo_exe: "sudo"
   # Do not set global become here; tasks will use become where needed.
   # Pre-check: verify whether sudo is passwordless for the remote user.
   pre_tasks:
