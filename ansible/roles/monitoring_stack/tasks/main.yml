@@ -150,8 +150,6 @@
     force: yes
     update: yes
     accept_hostkey: yes
-    owner: "{{ monitor_user }}"
-    group: "{{ monitor_user }}"
   when: repo_url | length > 0
 
 - name: Copy project from control node when local_copy is true
