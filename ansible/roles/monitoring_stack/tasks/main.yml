@@ -198,7 +198,7 @@
     group: "{{ monitor_user }}"
     recurse: yes
 
-- name: Diagnostic: stat docker socket
+- name: "Diagnostic: stat docker socket"
   ansible.builtin.stat:
     path: /var/run/docker.sock
   register: docker_sock_stat
