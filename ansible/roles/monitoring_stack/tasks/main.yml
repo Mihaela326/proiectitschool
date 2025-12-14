@@ -168,6 +168,8 @@
         force: yes
         update: yes
         accept_hostkey: yes
+      become: yes
+      become_user: "{{ monitor_user }}"
   when: repo_url | length > 0
 
 - name: Copy project from control node when local_copy is true
