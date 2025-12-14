@@ -60,7 +60,7 @@
         state: latest
         update_cache: yes
   rescue:
-    - name: Fallback: install docker via convenience script
+    - name: "Fallback: install docker via convenience script"
       ansible.builtin.shell: curl -fsSL https://get.docker.com | sh
       args:
         warn: false
@@ -90,7 +90,7 @@
           - containerd.io
         state: latest
   rescue:
-    - name: Fallback: install docker via convenience script
+    - name: "Fallback: install docker via convenience script"
       ansible.builtin.shell: curl -fsSL https://get.docker.com | sh
       args:
         warn: false

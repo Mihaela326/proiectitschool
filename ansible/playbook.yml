@@ -1,13 +1,29 @@
 ---
 - name: Deploy Monitoring Stack to remote hosts
   hosts: monitoring:monitor_hub
-  become: true
   vars:
     # If set, playbook will git clone this repo. If empty, set `local_copy: true` and provide `local_src_path`.
-    repo_url: ""
+    repo_url: "https://github.com/Mihaela326/proiectitschool.git"
     repo_branch: "main"
     project_dir: "/opt/monitoring-stack"
     local_copy: false
     local_src_path: ""  # path on control machine to copy if not using git
+  # Do not set global become here; tasks will use become where needed.
+  # Pre-check: verify whether sudo is passwordless for the remote user.
+  pre_tasks:
+    - name: Check for passwordless sudo (non-interactive)
+      ansible.builtin.command: sudo -n true
+      register: sudo_check
+      ignore_errors: true
+
+    - name: Fail early when sudo requires a password and none provided
+      ansible.builtin.fail:
+        msg: |
+          The remote host requires a sudo password for the connection user.
+          Re-run the playbook with the become password prompt enabled:
+            ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --ask-become-pass
+
+          Or configure passwordless sudo for the Ansible user on the target hosts.
+      when: sudo_check.rc != 0 and (ansible_become_pass is not defined)
   roles:
     - monitoring_stack

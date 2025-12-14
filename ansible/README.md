@@ -19,9 +19,17 @@ Usage
 
 3. Run the playbook:
 
+If the remote user requires a sudo password, run with the become password prompt:
+
 ```powershell
-# Run against inventory
-ansible-playbook -i ansible/inventory.ini ansible/playbook.yml -u <ssh-user> --become
+# Run against inventory (asks for sudo password)
+ansible-playbook -i ansible/inventory.ini ansible/playbook.yml -e "repo_url=https://github.com/your/repo.git" --ask-become-pass
+```
+
+If the remote user has passwordless sudo, run normally:
+
+```powershell
+ansible-playbook -i ansible/inventory.ini ansible/playbook.yml -e "repo_url=https://github.com/your/repo.git" --become
 ```
 
 Examples
