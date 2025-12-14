@@ -103,9 +103,25 @@
     enabled: yes
 
 - name: Install docker-compose via pip
-  ansible.builtin.pip:
-    name: docker-compose
-    executable: pip3
+  block:
+    - name: Install docker compose plugin via apt (preferred on Debian)
+      ansible.builtin.apt:
+        name: docker-compose-plugin
+        state: present
+        update_cache: yes
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Install docker-compose via pip (fallback)
+      ansible.builtin.pip:
+        name: docker-compose
+        executable: pip3
+        extra_args: "--break-system-packages"
+      when: ansible_facts['os_family'] != 'Debian' or (ansible_facts['os_family'] == 'Debian' and (ansible_pkg_mgr is defined and 'apt' not in ansible_pkg_mgr))
+  rescue:
+    - name: "Fallback: install docker-compose via pip without break-system-packages"
+      ansible.builtin.pip:
+        name: docker-compose
+        executable: pip3
 
 - name: Create monitoring user
   ansible.builtin.user:
