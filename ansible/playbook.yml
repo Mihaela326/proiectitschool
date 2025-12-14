@@ -29,4 +29,5 @@
           `--ask-become-pass` flag, or configure passwordless sudo on the targets.
       when: sudo_check.rc != 0 and (ansible_become_pass | default('') == '')
   roles:
-    - monitoring_stack
+    - role: monitoring_stack
+      become: yes
