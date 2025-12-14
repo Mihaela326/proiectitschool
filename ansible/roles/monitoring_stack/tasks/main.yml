@@ -222,7 +222,7 @@
 
 - name: Gather running containers as monitoring user
   ansible.builtin.shell: |
-    sudo -u {{ monitor_user }} docker ps --format "table {{.Names}}\t{{.Status}}"
+    sudo -u {{ monitor_user }} docker ps
   register: docker_ps
   changed_when: false
   become: yes
