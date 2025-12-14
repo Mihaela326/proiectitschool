@@ -53,3 +53,16 @@ Notes and caveats
 Additional info
 
 - **Sudo password prompt:** The playbook will now prompt for the sudo/become password at the start of the run. You can still use the `--ask-become-pass` flag; the prompt is provided to make runs more convenient when you forget the flag. If you prefer not to be prompted, configure passwordless sudo for the Ansible user on target hosts or provide `ansible_become_pass` via an encrypted variable (Ansible Vault).
+
+-Ad‑hoc: execută o comandă și vezi output imediat- Listă containere + stare
+```powershell
+ansible monitoring -i ansible/inventory.ini -m shell -a "docker ps --format '{{.Names}} {{.Status}}'" --become
+```
+-Verifică dacă docker compose a pornit (last 200 linii):
+```powershell
+ansible monitoring -i ansible/inventory.ini -m shell -a "cd /opt/monitoring-stack && docker compose logs --no-color --tail=200" --become
+```
+-Jurnale systemd (ex.: docker daemon)
+```powershell
+ansible monitoring -i ansible/inventor y.ini -m shell -a "journalctl -u docker -n 200 --no-pager" --become
+```
