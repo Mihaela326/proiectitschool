@@ -160,6 +160,16 @@
           or run the playbook with `local_copy: true` and set `local_src_path` on the control machine.
       when: (repo_check is failed or (repo_check.status is defined and repo_check.status not in [200,301,302])) and (local_copy | default(false) | bool == false)
 
+    - name: Ensure git safe.directory configured if repo already exists
+      ansible.builtin.stat:
+        path: "{{ project_dir }}/.git"
+      register: existing_gitdir
+
+    - name: Configure git safe.directory for root to avoid dubious ownership errors
+      ansible.builtin.command: git config --global --add safe.directory "{{ project_dir }}"
+      when: existing_gitdir.stat.exists | default(false)
+      become: yes
+
     - name: Clone project from git when repo_url provided
       ansible.builtin.git:
         repo: "{{ repo_url }}"
@@ -168,8 +178,6 @@
         force: yes
         update: yes
         accept_hostkey: yes
-      become: yes
-      become_user: "{{ monitor_user }}"
   when: repo_url | length > 0
 
 - name: Copy project from control node when local_copy is true
