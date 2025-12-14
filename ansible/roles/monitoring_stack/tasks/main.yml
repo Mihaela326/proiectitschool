@@ -133,6 +133,15 @@
     append: yes
     state: present
 
+- name: Allow monitoring user to run docker without password via sudo
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/monitoring
+    line: "{{ monitor_user }} ALL=(ALL) NOPASSWD: /usr/bin/docker, /usr/local/bin/docker-compose"
+    create: yes
+    mode: '0440'
+    validate: /usr/sbin/visudo -cf %s
+  become: yes
+
 - name: Create project directory
   ansible.builtin.file:
     path: "{{ project_dir }}"
@@ -198,26 +207,25 @@
     group: "{{ monitor_user }}"
     recurse: yes
 
-- name: Run docker compose up -d as monitoring user
-  ansible.builtin.command:
-    cmd: docker compose up -d --remove-orphans
-    chdir: "{{ project_dir }}"
+- name: Run docker compose up -d
+  ansible.builtin.shell: |
+    cd "{{ project_dir }}"
+    sudo -u {{ monitor_user }} docker compose up -d --remove-orphans
   register: compose_up
   changed_when: "'Up' in compose_up.stdout or compose_up.rc == 0"
   failed_when: compose_up.rc != 0 and compose_up.rc != 1
   become: yes
-  become_user: "{{ monitor_user }}"
 
 - name: Wait for containers to be healthy (short pause)
   ansible.builtin.pause:
     seconds: 5
 
 - name: Gather running containers as monitoring user
-  ansible.builtin.command:
-    cmd: docker ps --format "{{'{{.Names}}'}} {{'{{.Status}}'}}"
+  ansible.builtin.shell: |
+    sudo -u {{ monitor_user }} docker ps --format "{{'{{'}}{{.Names}}{{'}}'}} {{'{{'}}{{.Status}}{{'}}'}}"
   register: docker_ps
+  changed_when: false
   become: yes
-  become_user: "{{ monitor_user }}"
 
 - name: Show running containers
   ansible.builtin.debug:
