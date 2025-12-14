@@ -205,6 +205,7 @@
   register: compose_up
   changed_when: "'Up' in compose_up.stdout or compose_up.rc == 0"
   failed_when: compose_up.rc != 0 and compose_up.rc != 1
+  become: yes
 
 - name: Wait for containers to be healthy (short pause)
   ansible.builtin.pause:
@@ -214,6 +215,7 @@
   ansible.builtin.command:
     cmd: docker ps --format "{{'{{.Names}}'}} {{'{{.Status}}'}}"
   register: docker_ps
+  become: yes
 
 - name: Show running containers
   ansible.builtin.debug:
