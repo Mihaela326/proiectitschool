@@ -1,6 +1,11 @@
 ---
 - name: Deploy Monitoring Stack to remote hosts
   hosts: monitoring:monitor_hub
+  vars_prompt:
+    - name: "ansible_become_pass"
+      prompt: "Sudo password for remote hosts (leave empty if passwordless)"
+      private: yes
+      default: ""
   vars:
     # If set, playbook will git clone this repo. If empty, set `local_copy: true` and provide `local_src_path`.
     repo_url: "https://github.com/Mihaela326/proiectitschool.git"
@@ -20,10 +25,8 @@
       ansible.builtin.fail:
         msg: |
           The remote host requires a sudo password for the connection user.
-          Re-run the playbook with the become password prompt enabled:
-            ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --ask-become-pass
-
-          Or configure passwordless sudo for the Ansible user on the target hosts.
-      when: sudo_check.rc != 0 and (ansible_become_pass is not defined)
+          Provide the password when prompted, re-run the playbook with the
+          `--ask-become-pass` flag, or configure passwordless sudo on the targets.
+      when: sudo_check.rc != 0 and (ansible_become_pass | default('') == '')
   roles:
     - monitoring_stack

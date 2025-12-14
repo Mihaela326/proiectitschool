@@ -49,3 +49,7 @@ Notes and caveats
 - The role tries to install Docker using official distro repos and falls back to the Docker convenience script if necessary.
 - The playbook installs `docker-compose` via `pip3` so `pip3` is required to be installed.
 - This playbook is intended as a practical, extensible starting point. Review and harden (firewall, SELinux, non-root docker access) before using in production.
+
+Additional info
+
+- **Sudo password prompt:** The playbook will now prompt for the sudo/become password at the start of the run. You can still use the `--ask-become-pass` flag; the prompt is provided to make runs more convenient when you forget the flag. If you prefer not to be prompted, configure passwordless sudo for the Ansible user on target hosts or provide `ansible_become_pass` via an encrypted variable (Ansible Vault).
