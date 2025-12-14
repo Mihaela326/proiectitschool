@@ -143,13 +143,31 @@
     recurse: yes
 
 - name: Clone project from git when repo_url provided
-  ansible.builtin.git:
-    repo: "{{ repo_url }}"
-    dest: "{{ project_dir }}"
-    version: "{{ repo_branch }}"
-    force: yes
-    update: yes
-    accept_hostkey: yes
+  block:
+    - name: Check repository URL is reachable from target host
+      ansible.builtin.uri:
+        url: "{{ repo_url }}"
+        method: HEAD
+        timeout: 10
+      register: repo_check
+      ignore_errors: true
+
+    - name: Fail if repository is unreachable and local_copy not requested
+      ansible.builtin.fail:
+        msg: |
+          The repository {{ repo_url }} is not reachable from the target host (status: {{ repo_check.status | default('unreachable') }}).
+          Either ensure the host can access the repository (network, DNS, credentials),
+          or run the playbook with `local_copy: true` and set `local_src_path` on the control machine.
+      when: (repo_check is failed or (repo_check.status is defined and repo_check.status not in [200,301,302])) and (local_copy | default(false) | bool == false)
+
+    - name: Clone project from git when repo_url provided
+      ansible.builtin.git:
+        repo: "{{ repo_url }}"
+        dest: "{{ project_dir }}"
+        version: "{{ repo_branch }}"
+        force: yes
+        update: yes
+        accept_hostkey: yes
   when: repo_url | length > 0
 
 - name: Copy project from control node when local_copy is true
