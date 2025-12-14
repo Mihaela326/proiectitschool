@@ -66,3 +66,6 @@ ansible monitoring -i ansible/inventory.ini -m shell -a "cd /opt/monitoring-stac
 ```powershell
 ansible monitoring -i ansible/inventor y.ini -m shell -a "journalctl -u docker -n 200 --no-pager" --become
 ```
+```powershell
+ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --ask-become-pass
+```
