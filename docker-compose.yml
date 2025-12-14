@@ -35,8 +35,6 @@ services:
     image: system-monitor-hub:latest
     container_name: monitor_hub
     restart: always
-    profiles:
-      - dev
     ports:
       - "8080:8080"
     volumes:

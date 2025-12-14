@@ -207,10 +207,10 @@
     group: "{{ monitor_user }}"
     recurse: yes
 
-- name: Run docker compose up -d
+- name: Run docker compose up -d (including dev profile for hub)
   ansible.builtin.shell: |
     cd "{{ project_dir }}"
-    sudo -u {{ monitor_user }} docker compose up -d --remove-orphans
+    sudo -u {{ monitor_user }} docker compose --profile dev up -d --remove-orphans
   register: compose_up
   changed_when: "'Up' in compose_up.stdout or compose_up.rc == 0"
   failed_when: compose_up.rc != 0 and compose_up.rc != 1
